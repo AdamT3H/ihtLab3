@@ -1,17 +1,16 @@
 #!/bin/bash
 
-REGION="us-east-1"
-
 echo "=== Створення EC2 інстансу ==="
 
 INSTANCE_ID=$(aws ec2 run-instances \
-  --image-id ami-0360c520857e3138f \
+  --image-id ami-01bc990364452ab3e \
   --count 1 \
   --instance-type t3.micro \
-  --key-name iht-key-pair \
+  --key-name adam-key \
   --security-group-ids sg-01a6b8a9bb5bd52b9 \
   --user-data file://user-data.sh \
-  --region $REGION \
+  --region "us-east-1" \
+  --iam-instance-profile Name="default" \
   --tag-specifications "ResourceType=instance,Tags=[{Key=Name,Value=Task3}]" \
   --query "Instances[0].InstanceId" \
   --output text)
@@ -19,7 +18,7 @@ INSTANCE_ID=$(aws ec2 run-instances \
 echo "Instance ID: $INSTANCE_ID"
 
 echo "=== Очікування запуску інстансу... ==="
-aws ec2 wait instance-running --instance-ids $INSTANCE_ID --region $REGION
+aws ec2 wait instance-running --instance-ids $INSTANCE_ID --region "us-east-1"
 
 echo "=== Отримання публічного IP ==="
 PUBLIC_IP=$(aws ec2 describe-instances \
@@ -34,7 +33,4 @@ sleep 20
 
 echo "=== Вивід логів sysinfo ==="
 
-ssh -o StrictHostKeyChecking=no \
-    -i ./iht-key-pair.pem \
-    ec2-user@$PUBLIC_IP \
-    "sudo tail -n 30 /var/log/sysinfo"
+ssh -i ./adam-key.pem ec2-user@$PUBLIC_IP
