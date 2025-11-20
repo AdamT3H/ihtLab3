@@ -1,44 +1,38 @@
 #!/bin/bash
 
-apt update -y
-apt install -y cron
+yum update -y
+yum install -y cronie
 
-systemctl enable cron
-systemctl start cron
-systemctl status cron
+systemctl enable crond
+systemctl start crond
 
 touch /var/log/sysinfo
-chmod 666 /var/log/sysinfo
 
-cat << 'EOF' > /root/sysinfo.sh
+cat > /root/sysinfo.sh << 'EOF' 
 #!/bin/bash
 LOGFILE="/var/log/sysinfo"
-
 {
-  echo "==================== $(date '+%Y-%m-%d %H:%M:%S') ===================="
-  echo "---- System uptime, logged users, and CPU load ----"
+  echo "=============================="
+  echo "DATE: $(date)"
+  echo "--- UPTIME / USERS / LOAD ---"
   w
-  echo ""
-  echo "---- Memory and Disk usage ----"
+  echo "--- MEMORY USAGE ---"
   free -m
-  echo ""
+  echo "--- DISK USAGE ---"
   df -h
-  echo ""
-  echo "---- Open TCP ports ----"
+  echo "--- OPEN TCP PORTS ---"
   ss -tulpn
-  echo ""
-  echo "---- Check connection to ukr.net ----"
+  echo "--- PING ukr.net ---"
   ping -c1 -w1 ukr.net
-  echo ""
-  echo "---- SUID programs ----"
+  echo "--- SUID PROGRAMS ---"
   find / -perm -4000 -type f 2>/dev/null
-  echo ""
+  echo
 } >> "$LOGFILE"
 EOF
 
 chmod +x /root/sysinfo.sh
 
-echo "* * * * 1-5 root /root/sysinfo.sh" >> /etc/crontab
+echo "* * * * 1-5 root /root/sysinfo.sh" > /etc/crontab
 
-systemctl restart cron
-systemctl status cron
+systemctl enable crond
+systemctl start crond
