@@ -10,7 +10,6 @@ INSTANCE_ID=$(aws ec2 run-instances \
   --security-group-ids sg-01a6b8a9bb5bd52b9 \
   --user-data file://user-data.sh \
   --region "us-east-1" \
-  --iam-instance-profile Name="default" \
   --tag-specifications "ResourceType=instance,Tags=[{Key=Name,Value=Task3}]" \
   --query "Instances[0].InstanceId" \
   --output text)
