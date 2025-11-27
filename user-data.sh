@@ -21,7 +21,7 @@ LOGFILE="/var/log/sysinfo"
   echo "--- DISK USAGE ---"
   df -h
   echo "--- OPEN TCP PORTS ---"
-  ss -tulpn
+  /usr/sbin/ss -tlpn 2>/dev/null
   echo "--- PING ukr.net ---"
   ping -c1 -w1 ukr.net
   echo "--- SUID PROGRAMS ---"
